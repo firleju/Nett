@@ -6,14 +6,24 @@
     using System.Linq;
     using Extensions;
 
-    public sealed class TomlArray : TomlValue<TomlValue[]>
+    public sealed class TomlArray : TomlValue<List<TomlValue>>
     {
+        internal TomlArray(ITomlRoot root)
+            : this(root, new List<TomlValue>())
+        {
+        }
+
         internal TomlArray(ITomlRoot root, params TomlValue[] values)
+            : this(root, new List<TomlValue>(values))
+        {
+        }
+
+        internal TomlArray(ITomlRoot root, List<TomlValue> values)
             : base(root, values)
         {
         }
 
-        public int Length => this.Value.Length;
+        public int Length => this.Value.Count;
 
         public override string ReadableTypeName => "array";
 
@@ -34,7 +44,7 @@
             if (t.IsArray)
             {
                 var et = t.GetElementType();
-                var a = Array.CreateInstance(et, this.Value.Length);
+                var a = Array.CreateInstance(et, this.Value.Count);
                 int cnt = 0;
                 foreach (var i in this.Value)
                 {
@@ -64,7 +74,7 @@
             return collection;
         }
 
-        public TomlObject Last() => this.Value[this.Value.Length - 1];
+        public TomlObject Last() => this.Value[this.Value.Count - 1];
 
         public IEnumerable<T> To<T>() => this.To<T>(TomlConfig.DefaultInstance);
 

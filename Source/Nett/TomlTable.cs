@@ -153,10 +153,10 @@
         }
 
         void ICollection<KeyValuePair<string, TomlObject>>.Add(KeyValuePair<string, TomlObject> item)
-            => this.AddRow(new TomlKey(this.Root, item.Key), item.Value);
+            => this.AttachRow(new TomlKey(this.Root, item.Key), item.Value);
 
         void IDictionary<string, TomlObject>.Add(string key, TomlObject value)
-            => this.AddRow(new TomlKey(this.Root, key), value);
+            => this.AttachRow(new TomlKey(this.Root, key), value);
 
         IEnumerator IEnumerable.GetEnumerator() => this.rows.GetEnumerator();
 
@@ -230,15 +230,19 @@
             foreach (DictionaryEntry r in dict)
             {
                 var obj = TomlObject.CreateFrom(root, r.Value, null);
-                tomlTable.AddRow(new TomlKey(tomlTable.Root, (string)r.Key), obj);
+                tomlTable.AttachRow(new TomlKey(tomlTable.Root, (string)r.Key), obj);
             }
 
             return tomlTable;
         }
 
-        internal TomlObject AddRow(TomlKey key, TomlObject value)
+        internal TomlObject AttachRow(TomlKey key, TomlObject value)
         {
             this.CheckNotFrozen();
+
+            key = (TomlKey)key.AttachToOrCloneFor(this);
+            value = value.AttachToOrCloneFor(key);
+
             var toAdd = this.EnsureCorrectRoot(value);
             this.rows.Add(key, toAdd);
             return toAdd;
@@ -274,7 +278,7 @@
 
             foreach (var r in this.rows)
             {
-                table.AddRow(r.Key, r.Value.WithRoot(root));
+                table.AttachRow(r.Key, r.Value.WithRoot(root));
             }
 
             return table;
@@ -286,7 +290,7 @@
 
             foreach (var r in this.rows)
             {
-                tbl.AddRow(r.Key, r.Value);
+                tbl.AttachRow(r.Key, r.Value);
             }
 
             return tbl;
@@ -316,12 +320,12 @@
         {
             foreach (var a in allObjects.Where(o => !ScopeCreatingType(o.Item2)))
             {
-                this.AddRow(new TomlKey(this.Root, a.Item1), a.Item2);
+                this.AttachRow(new TomlKey(this.Root, a.Item1), a.Item2);
             }
 
             foreach (var a in allObjects.Where(o => ScopeCreatingType(o.Item2)))
             {
-                this.AddRow(new TomlKey(this.Root, a.Item1), a.Item2);
+                this.AttachRow(new TomlKey(this.Root, a.Item1), a.Item2);
             }
         }
 

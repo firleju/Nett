@@ -27,7 +27,7 @@
         public TomlTableArray(ITomlRoot root, List<TomlTable> tables)
             : base(root)
         {
-            foreach (var t in tables) { this.CheckTableCanBeAdded(t); }
+            foreach (var t in tables) { this.CheckTableCanBeAttached(t); }
 
             this.items = tables;
         }
@@ -47,20 +47,20 @@
             get => this.items[index];
             set
             {
-                this.CheckTableCanBeAdded(value);
+                this.CheckTableCanBeAttached(value);
                 this.items[index] = value;
             }
         }
 
         public void Add(TomlTable table)
         {
-            this.CheckTableCanBeAdded(table);
+            this.CheckTableCanBeAttached(table);
             this.items.Add(table);
         }
 
         public void AddRange(IEnumerable<TomlTable> tables)
         {
-            foreach (var t in tables) { this.CheckTableCanBeAdded(t); }
+            foreach (var t in tables) { this.CheckTableCanBeAttached(t); }
             this.items.AddRange(tables);
         }
 
@@ -159,7 +159,7 @@
             throw new NotImplementedException();
         }
 
-        private void CheckTableCanBeAdded(TomlTable table)
+        private void CheckTableCanBeAttached(TomlTable table)
         {
             if (this.Root != table.Root)
             {

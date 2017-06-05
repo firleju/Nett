@@ -82,7 +82,7 @@ namespace Nett
                         "Cannot create table with rows belonging to a different TOML object graph root.");
                 }
 
-                tbl.AddRow(new TomlKey(tbl.Root, kvp.Key), kvp.Value);
+                tbl.AttachRow(new TomlKey(tbl.Root, kvp.Key), kvp.Value);
             }
 
             return tbl;

@@ -121,8 +121,8 @@
             {
                 switch (r.Value.TomlType)
                 {
-                    case TomlObjectType.Table: cloned.AddRow(r.Key, ((TomlTable)r.Value).Clone()); break;
-                    case TomlObjectType.ArrayOfTables: cloned.AddRow(r.Key, ((TomlTableArray)r.Value).Clone()); break;
+                    case TomlObjectType.Table: cloned.AttachRow(r.Key, ((TomlTable)r.Value).Clone()); break;
+                    case TomlObjectType.ArrayOfTables: cloned.AttachRow(r.Key, ((TomlTableArray)r.Value).Clone()); break;
                     default: cloned[r.Key.Value] = r.Value; break;
                 }
             }

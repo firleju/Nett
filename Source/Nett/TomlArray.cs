@@ -35,8 +35,12 @@
 
         public TomlValue this[int index]
         {
-            get { return this.Value[index]; }
-            set { this.Value[index] = value; }
+            get => this.Value[index];
+            set
+            {
+                this.CheckCanAttachItem(value);
+                this.Value[index] = value;
+            }
         }
 
         public T Get<T>(int index) => this.Value[index].Get<T>();
@@ -91,19 +95,23 @@
 
         public int IndexOf(TomlValue item) => this.Value.IndexOf(item);
 
-        public void Insert(int index, TomlValue item) => this.Value.Insert(index, item);
+        public void Insert(int index, TomlValue item)
+        {
+            this.CheckCanAttachItem(item);
+            this.Value.Insert(index, item);
+        }
 
         public void RemoveAt(int index) => this.Value.RemoveAt(index);
 
         public void Add(TomlValue item)
         {
-            this.CheckCanAddItem(item);
+            this.CheckCanAttachItem(item);
             this.Value.Add(item);
         }
 
         public void AddRange(IEnumerable<TomlValue> items)
         {
-            foreach (var i in items) { this.CheckCanAddItem(i); }
+            foreach (var i in items) { this.CheckCanAttachItem(i); }
             this.Value.AddRange(items);
         }
 
@@ -147,7 +155,7 @@
 
         internal override TomlObject CloneFor(TomlObject newParent) => this.CloneArrayFor(newParent);
 
-        private void CheckCanAddItem(TomlValue item)
+        private void CheckCanAttachItem(TomlValue item)
         {
             if (item.Root != this.Root)
             {

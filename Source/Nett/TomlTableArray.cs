@@ -139,6 +139,26 @@
             return a;
         }
 
+        internal TomlTableArray CloneArrayFor(TomlObject newParent)
+        {
+            var ta = new TomlTableArray(this.Root)
+            {
+                parent = newParent,
+            };
+
+            foreach (var t in this.items)
+            {
+                ta.Add(t.CloneTableFor(ta));
+            }
+
+            return ta;
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent)
+        {
+            throw new NotImplementedException();
+        }
+
         private void CheckTableCanBeAdded(TomlTable table)
         {
             if (this.Root != table.Root)

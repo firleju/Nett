@@ -28,5 +28,15 @@ namespace Nett
 
             return new TomlInt(root, this.Value);
         }
+
+        internal TomlInt CloneIntFor(TomlObject newParent)
+        {
+            return new TomlInt(this.Root, this.Value)
+            {
+                parent = newParent,
+            };
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneIntFor(newParent);
     }
 }

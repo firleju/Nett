@@ -29,5 +29,12 @@
 
             return new TomlTimeSpan(root, this.Value);
         }
+
+        internal TomlTimeSpan CloneTimespanFor(TomlObject newParent)
+        {
+            return new TomlTimeSpan(this.Root, this.Value) { parent = newParent };
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneTimespanFor(newParent);
     }
 }

@@ -42,5 +42,12 @@
 
             return new TomlString(root, this.Value, this.type);
         }
+
+        internal TomlString CloneStringFor(TomlObject newParent)
+        {
+            return new TomlString(this.Root, this.Value) { parent = newParent };
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneStringFor(newParent);
     }
 }

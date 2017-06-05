@@ -62,6 +62,16 @@ namespace Nett
 
         internal override TomlObject WithRoot(ITomlRoot root) => new TomlKey(root, this.Value, this.Type);
 
+        internal TomlKey CloneKeyFor(TomlObject newParent)
+        {
+            return new TomlKey(this.Root, this.Value, this.Type)
+            {
+                parent = newParent,
+            };
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneKeyFor(newParent);
+
         private static KeyType AutoClassify(string input)
         {
             if (input.HasBareKeyCharsOnly()) { return KeyType.Bare; }

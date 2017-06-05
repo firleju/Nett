@@ -26,6 +26,13 @@
             throw new NotImplementedException();
         }
 
+        internal TomlSource CloneSourceFor(TomlObject newParent)
+        {
+            return new TomlSource(this.Root, this.Value) { parent = newParent };
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneSourceFor(newParent);
+
         internal override TomlObject WithRoot(ITomlRoot root)
         {
             root.CheckNotNull(nameof(root));

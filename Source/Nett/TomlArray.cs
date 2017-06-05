@@ -130,6 +130,23 @@
             return new TomlArray(root, this.Value.Select(i => i.ValueWithRoot(root)).ToArray());
         }
 
+        internal TomlArray CloneArrayFor(TomlObject newParent)
+        {
+            var a = new TomlArray(this.Root)
+            {
+                parent = newParent,
+            };
+
+            foreach (var v in this.Value)
+            {
+                a.Add((TomlValue)v.CloneFor(a));
+            }
+
+            return a;
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneArrayFor(newParent);
+
         private void CheckCanAddItem(TomlValue item)
         {
             if (item.Root != this.Root)

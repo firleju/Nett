@@ -24,6 +24,8 @@
 
     public abstract class TomlObject
     {
+        protected TomlObject parent;
+
         internal TomlObject(ITomlRoot root)
         {
             if (root == null && this.GetType() != typeof(TomlTable.RootTable)) { throw new ArgumentNullException(nameof(root)); }
@@ -79,6 +81,26 @@
         }
 
         internal abstract TomlObject WithRoot(ITomlRoot root);
+
+        internal abstract TomlObject CloneFor(TomlObject newParent);
+
+        internal TomlObject AttachToOrCloneFor(TomlObject newParent)
+        {
+            return this.AttachTo(newParent)
+                ? this
+                : this.CloneFor(newParent);
+        }
+
+        private bool AttachTo(TomlObject newParent)
+        {
+            if (this.parent == null)
+            {
+                this.parent = newParent;
+                return true;
+            }
+
+            return false;
+        }
 
         private static TomlObject CreateArrayType(ITomlRoot root, IEnumerable e)
         {

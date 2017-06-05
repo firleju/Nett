@@ -28,5 +28,15 @@ namespace Nett
 
             return new TomlBool(root, this.Value);
         }
+
+        internal TomlBool CloneBoolFor(TomlObject newParent)
+        {
+            return new TomlBool(this.Root, this.Value)
+            {
+                parent = newParent,
+            };
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneBoolFor(newParent);
     }
 }

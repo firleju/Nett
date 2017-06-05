@@ -280,6 +280,20 @@
             return table;
         }
 
+        internal TomlTable CloneTableFor(TomlObject newParent)
+        {
+            var tbl = new TomlTable(this.Root, this.TableType) { parent = newParent };
+
+            foreach (var r in this.rows)
+            {
+                tbl.AddRow(r.Key, r.Value);
+            }
+
+            return tbl;
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneTableFor(newParent);
+
         internal override TomlObject WithRoot(ITomlRoot root) => this.TableWithRoot(root);
 
         protected virtual void OnRowValueSet(string rowKey)

@@ -28,5 +28,15 @@ namespace Nett
 
             return new TomlFloat(root, this.Value);
         }
+
+        internal TomlFloat CloneFloatFor(TomlObject parent)
+        {
+            return new TomlFloat(this.Root, this.Value)
+            {
+                parent = parent,
+            };
+        }
+
+        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneFloatFor(newParent);
     }
 }

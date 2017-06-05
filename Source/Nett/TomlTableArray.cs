@@ -6,7 +6,7 @@
     using System.Linq;
     using Extensions;
 
-    public sealed class TomlTableArray : TomlObject
+    public sealed class TomlTableArray : TomlObject, IEnumerable<TomlTable>, ICollection<TomlTable>, IList<TomlTable>
     {
         private static readonly Type ListType = typeof(IList);
         private static readonly Type ObjectType = typeof(object);
@@ -40,11 +40,28 @@
 
         public override TomlObjectType TomlType => TomlObjectType.ArrayOfTables;
 
-        public TomlTable this[int index] => this.items[index];
+        public bool IsReadOnly => false;
+
+        public TomlTable this[int index]
+        {
+            get => this.items[index];
+            set
+            {
+                this.CheckTableCanBeAdded(value);
+                this.items[index] = value;
+            }
+        }
 
         public void Add(TomlTable table)
         {
+            this.CheckTableCanBeAdded(table);
             this.items.Add(table);
+        }
+
+        public void AddRange(IEnumerable<TomlTable> tables)
+        {
+            foreach (var t in tables) { this.CheckTableCanBeAdded(t); }
+            this.items.AddRange(tables);
         }
 
         public override object Get(Type t)
@@ -90,6 +107,24 @@
         {
             visitor.Visit(this);
         }
+
+        public IEnumerator<TomlTable> GetEnumerator() => this.items.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => this.items.GetEnumerator();
+
+        public int IndexOf(TomlTable item) => this.items.IndexOf(item);
+
+        public void Insert(int index, TomlTable item) => this.items.Insert(index, item);
+
+        public void RemoveAt(int index) => this.items.RemoveAt(index);
+
+        public void Clear() => this.items.Clear();
+
+        public bool Contains(TomlTable item) => this.items.Contains(item);
+
+        public void CopyTo(TomlTable[] array, int arrayIndex) => this.items.CopyTo(array, arrayIndex);
+
+        public bool Remove(TomlTable item) => this.items.Remove(item);
 
         internal override TomlObject WithRoot(ITomlRoot root)
         {

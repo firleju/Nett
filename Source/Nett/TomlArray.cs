@@ -6,7 +6,7 @@
     using System.Linq;
     using Extensions;
 
-    public sealed class TomlArray : TomlValue<List<TomlValue>>
+    public sealed class TomlArray : TomlValue<List<TomlValue>>, IEnumerable<TomlValue>, ICollection<TomlValue>, IList<TomlValue>
     {
         internal TomlArray(ITomlRoot root)
             : this(root, new List<TomlValue>())
@@ -28,6 +28,10 @@
         public override string ReadableTypeName => "array";
 
         public override TomlObjectType TomlType => TomlObjectType.Array;
+
+        public int Count => this.Value.Count;
+
+        public bool IsReadOnly => false;
 
         public TomlValue this[int index]
         {
@@ -85,6 +89,36 @@
             visitor.Visit(this);
         }
 
+        public int IndexOf(TomlValue item) => this.Value.IndexOf(item);
+
+        public void Insert(int index, TomlValue item) => this.Value.Insert(index, item);
+
+        public void RemoveAt(int index) => this.Value.RemoveAt(index);
+
+        public void Add(TomlValue item)
+        {
+            this.CheckCanAddItem(item);
+            this.Value.Add(item);
+        }
+
+        public void AddRange(IEnumerable<TomlValue> items)
+        {
+            foreach (var i in items) { this.CheckCanAddItem(i); }
+            this.Value.AddRange(items);
+        }
+
+        public void Clear() => this.Value.Clear();
+
+        public bool Contains(TomlValue item) => this.Value.Contains(item);
+
+        public void CopyTo(TomlValue[] array, int arrayIndex) => this.Value.CopyTo(array, arrayIndex);
+
+        public bool Remove(TomlValue item) => this.Value.Remove(item);
+
+        public IEnumerator<TomlValue> GetEnumerator() => this.Value.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => this.Value.GetEnumerator();
+
         internal override TomlObject WithRoot(ITomlRoot root) => this.ArrayWithRoot(root);
 
         internal override TomlValue ValueWithRoot(ITomlRoot root) => this.ArrayWithRoot(root);
@@ -94,6 +128,14 @@
             root.CheckNotNull(nameof(root));
 
             return new TomlArray(root, this.Value.Select(i => i.ValueWithRoot(root)).ToArray());
+        }
+
+        private void CheckCanAddItem(TomlValue item)
+        {
+            if (item.Root != this.Root)
+            {
+                throw new ArgumentException("Cannot add item to array as it already belongs to a different TOML object graph.");
+            }
         }
     }
 }

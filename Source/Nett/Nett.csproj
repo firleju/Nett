@@ -97,16 +97,16 @@
     <Compile Include="TomlConfig.Builder.Conversion.cs">
       <DependentUpon>TomlConfig.cs</DependentUpon>
     </Compile>
-    <Compile Include="TomlKey.cs" />
+    <Compile Include="TomlObjects\TomlKey.cs" />
     <Compile Include="TomlObjectFactory.Add.cs" />
     <Compile Include="TomlObjectFactory.Create.cs" />
     <Compile Include="TomlObjectFactory.cs" />
-    <Compile Include="TomlTable.RootTable.cs" />
+    <Compile Include="TomlObjects\TomlTable.RootTable.cs" />
     <Compile Include="TomlTableToDictionaryConverter.cs" />
     <Compile Include="Toml.cs" />
-    <Compile Include="TomlArray.cs" />
-    <Compile Include="TomlBool.cs" />
-    <Compile Include="TomlComment.cs" />
+    <Compile Include="TomlObjects\TomlArray.cs" />
+    <Compile Include="TomlObjects\TomlBool.cs" />
+    <Compile Include="TomlObjects\TomlComment.cs" />
     <Compile Include="TomlCommentAttribute.cs" />
     <Compile Include="TomlConfig.Builder.cs">
       <DependentUpon>TomlConfig.cs</DependentUpon>
@@ -114,17 +114,17 @@
     <Compile Include="TomlConfig.cs" />
     <Compile Include="TomlConverter.cs" />
     <Compile Include="TomlConverterBase.cs" />
-    <Compile Include="TomlDateTime.cs" />
-    <Compile Include="TomlFloat.cs" />
+    <Compile Include="TomlObjects\TomlDateTime.cs" />
+    <Compile Include="TomlObjects\TomlFloat.cs" />
     <Compile Include="TreatAsInlineTableAttribute.cs" />
-    <Compile Include="TomlInt.cs" />
-    <Compile Include="TomlObject.cs" />
-    <Compile Include="TomlString.cs" />
-    <Compile Include="TomlTable.cs" />
-    <Compile Include="TomlTableArray.cs" />
+    <Compile Include="TomlObjects\TomlInt.cs" />
+    <Compile Include="TomlObjects\TomlObject.cs" />
+    <Compile Include="TomlObjects\TomlString.cs" />
+    <Compile Include="TomlObjects\TomlTable.cs" />
+    <Compile Include="TomlObjects\TomlTableArray.cs" />
     <Compile Include="TomlTableToTypedDictionaryConverter.cs" />
-    <Compile Include="TomlTimeSpan.cs" />
-    <Compile Include="TomlValue.cs" />
+    <Compile Include="TomlObjects\TomlTimeSpan.cs" />
+    <Compile Include="TomlObjects\TomlValue.cs" />
     <Compile Include="UserTypeMetaData.cs" />
     <Compile Include="Util\ReflectionUtil.cs" />
     <Compile Include="Writer\TomlWriter.cs" />

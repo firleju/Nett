@@ -14,21 +14,22 @@
 
         private readonly List<TomlTable> items = new List<TomlTable>();
 
-        public TomlTableArray(ITomlRoot root, IEnumerable<TomlTable> enumerable)
-            : base(root)
+        public TomlTableArray(ITomlRoot root)
+            : this(root, new List<TomlTable>())
         {
-            if (enumerable != null)
-            {
-                foreach (var e in enumerable)
-                {
-                    this.Add(e);
-                }
-            }
         }
 
-        internal TomlTableArray(ITomlRoot root)
-            : this(root, null)
+        public TomlTableArray(ITomlRoot root, IEnumerable<TomlTable> enumerable)
+            : this(root, new List<TomlTable>(enumerable))
         {
+        }
+
+        public TomlTableArray(ITomlRoot root, List<TomlTable> tables)
+            : base(root)
+        {
+            foreach (var t in tables) { this.CheckTableCanBeAdded(t); }
+
+            this.items = tables;
         }
 
         public int Count => this.items.Count;
@@ -101,6 +102,15 @@
 
             var a = new TomlTableArray(root, this.Items.Select(t => t.TableWithRoot(root)));
             return a;
+        }
+
+        private void CheckTableCanBeAdded(TomlTable table)
+        {
+            if (this.Root != table.Root)
+            {
+                throw new InvalidOperationException(
+                    "Cannot add table to table array because it already belongs to a different TOML object graph.");
+            }
         }
     }
 }

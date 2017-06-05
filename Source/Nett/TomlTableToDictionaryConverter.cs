@@ -63,7 +63,7 @@
         {
             var clrArray = new object[a.Length];
             var extractItem = new ExtractItemValue();
-            for (int i = 0; i < a.Items.Length; i++)
+            for (int i = 0; i < a.Length; i++)
             {
                 a[i].Visit(extractItem);
                 clrArray[i] = extractItem.Item;
@@ -120,7 +120,7 @@
             {
                 var clrArray = new object[a.Length];
                 var extractItem = new ExtractItemValue();
-                for (int i = 0; i < a.Items.Length; i++)
+                for (int i = 0; i < a.Length; i++)
                 {
                     a[i].Visit(extractItem);
                     clrArray[i] = extractItem.Item;

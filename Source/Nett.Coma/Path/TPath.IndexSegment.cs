@@ -25,7 +25,7 @@ namespace Nett.Coma.Path
             {
                 if (value is TomlArray a)
                 {
-                    a.Items[this.index] = (TomlValue)value;
+                    a[this.index] = (TomlValue)value;
                 }
                 else if (value is TomlTableArray ta)
                 {

@@ -40,15 +40,15 @@
             this.writer.Write(key.ToString());
             this.writer.Write(" = [");
 
-            for (int i = 0; i < array.Items.Length - 1; i++)
+            for (int i = 0; i < array.Length - 1; i++)
             {
                 this.WriteValue(array[i]);
                 this.writer.Write(", ");
             }
 
-            if (array.Items.Length > 0)
+            if (array.Length > 0)
             {
-                this.WriteValue(array.Items[array.Items.Length - 1]);
+                this.WriteValue(array[array.Length - 1]);
             }
 
             this.writer.Write(']');

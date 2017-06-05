@@ -13,15 +13,17 @@
         {
         }
 
-        public TomlValue[] Items => this.Value;
-
         public int Length => this.Value.Length;
 
         public override string ReadableTypeName => "array";
 
         public override TomlObjectType TomlType => TomlObjectType.Array;
 
-        public TomlObject this[int index] => this.Value[index];
+        public TomlValue this[int index]
+        {
+            get { return this.Value[index]; }
+            set { this.Value[index] = value; }
+        }
 
         public T Get<T>(int index) => this.Value[index].Get<T>();
 
@@ -81,7 +83,7 @@
         {
             root.CheckNotNull(nameof(root));
 
-            return new TomlArray(root, this.Items.Select(i => i.ValueWithRoot(root)).ToArray());
+            return new TomlArray(root, this.Value.Select(i => i.ValueWithRoot(root)).ToArray());
         }
     }
 }

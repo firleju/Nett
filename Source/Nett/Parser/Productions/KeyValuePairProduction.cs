@@ -6,7 +6,7 @@
     {
         public static Tuple<TomlKey, TomlObject> Apply(ITomlRoot root, TokenBuffer tokens)
         {
-            var key = KeyProduction.Apply(tokens);
+            var key = KeyProduction.Apply(root, tokens);
 
             tokens.ExpectAndConsume(TokenType.Assign);
 

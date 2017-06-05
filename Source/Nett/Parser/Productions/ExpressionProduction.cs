@@ -21,7 +21,7 @@
 
             tokens.ConsumeAllNewlines();
 
-            var arrayKeyChain = TomlArrayTableProduction.TryApply(tokens);
+            var arrayKeyChain = TomlArrayTableProduction.TryApply(root, tokens);
             if (arrayKeyChain != null)
             {
                 var addTo = GetTargetTable(root, arrayKeyChain, CreateImplicitelyType.Table);
@@ -35,7 +35,7 @@
                 return newArrayEntry;
             }
 
-            var tableKeyChain = TomlTableProduction.TryApply(tokens);
+            var tableKeyChain = TomlTableProduction.TryApply(root, tokens);
             if (tableKeyChain != null)
             {
                 var newTable = new TomlTable(root) { IsDefined = true };

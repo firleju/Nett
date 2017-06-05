@@ -20,5 +20,6 @@
         public static readonly Type TomlTableType = typeof(TomlTable);
         public static readonly Type TomlValueType = typeof(TomlValue);
         public static readonly Type TomlTableArrayType = typeof(TomlTableArray);
+        public static readonly Type TomlKeyType = typeof(TomlKey);
     }
 }

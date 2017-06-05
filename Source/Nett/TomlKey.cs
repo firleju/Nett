@@ -2,18 +2,18 @@
 
 namespace Nett
 {
-    internal struct TomlKey : IEquatable<TomlKey>
+    internal sealed class TomlKey : TomlObject, IEquatable<TomlKey>
     {
         public readonly string Value;
         public KeyType Type;
 
-        public TomlKey(string s)
+        public TomlKey(ITomlRoot root, string s)
+            : this(root, s, AutoClassify(s))
         {
-            this.Type = AutoClassify(s);
-            this.Value = s;
         }
 
-        public TomlKey(string key, KeyType type)
+        public TomlKey(ITomlRoot root, string key, KeyType type)
+            : base(root)
         {
             this.Value = key;
             this.Type = type;
@@ -26,6 +26,10 @@ namespace Nett
             Basic,
             Literal,
         }
+
+        public override string ReadableTypeName => "key";
+
+        public override TomlObjectType TomlType => TomlObjectType.Key;
 
         public static bool operator ==(TomlKey x, TomlKey y) => x.Value == y.Value;
 
@@ -51,6 +55,12 @@ namespace Nett
                 default: return this.Value;
             }
         }
+
+        public override object Get(Type t) => throw new NotSupportedException();
+
+        public override void Visit(ITomlObjectVisitor visitor) => throw new NotSupportedException();
+
+        internal override TomlObject WithRoot(ITomlRoot root) => new TomlKey(root, this.Value, this.Type);
 
         private static KeyType AutoClassify(string input)
         {

@@ -10,6 +10,7 @@
     [Flags]
     public enum TomlObjectType
     {
+        Key,
         Bool,
         Int,
         Float,
@@ -129,6 +130,7 @@
                 case TomlObjectType.Array: return Types.TomlArrayType;
                 case TomlObjectType.Table: return Types.TomlTableType;
                 case TomlObjectType.ArrayOfTables: return Types.TomlTableArrayType;
+                case TomlObjectType.Key: return Types.TomlKeyType;
                 default:
                     throw new InvalidOperationException($"Cannot convert '{t}' to corresponding class type.");
             }

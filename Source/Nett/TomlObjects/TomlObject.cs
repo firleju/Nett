@@ -24,7 +24,7 @@
 
     public abstract class TomlObject
     {
-        protected TomlObject parent;
+        protected ITomlContainer owner;
 
         internal TomlObject(ITomlRoot root)
         {
@@ -80,20 +80,20 @@
 
         internal abstract TomlObject WithRoot(ITomlRoot root);
 
-        internal abstract TomlObject CloneFor(TomlObject newParent);
+        internal abstract TomlObject CloneFor(ITomlContainer newOwner);
 
-        internal TomlObject AttachToOrCloneFor(TomlObject newParent)
+        internal TomlObject AttachToOrCloneFor(ITomlContainer newOwner)
         {
-            return this.AttachTo(newParent)
+            return this.AttachTo(newOwner)
                 ? this
-                : this.CloneFor(newParent);
+                : this.CloneFor(newOwner);
         }
 
-        private bool AttachTo(TomlObject newParent)
+        private bool AttachTo(ITomlContainer owner)
         {
-            if (this.parent == null)
+            if (this.owner == null)
             {
-                this.parent = newParent;
+                this.owner = owner;
                 return true;
             }
 

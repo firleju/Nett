@@ -2,7 +2,10 @@
 
 namespace Nett
 {
-    internal sealed class TomlKey : TomlObject, IEquatable<TomlKey>
+    internal sealed class TomlKey :
+        TomlObject,
+        IEquatable<TomlKey>,
+        ITomlContainer
     {
         public readonly string Value;
         public KeyType Type;
@@ -30,6 +33,8 @@ namespace Nett
         public override string ReadableTypeName => "key";
 
         public override TomlObjectType TomlType => TomlObjectType.Key;
+
+        ITomlRoot ITomlContainer.Root => this.Root;
 
         public static bool operator ==(TomlKey x, TomlKey y) => x.Value == y.Value;
 
@@ -62,15 +67,12 @@ namespace Nett
 
         internal override TomlObject WithRoot(ITomlRoot root) => new TomlKey(root, this.Value, this.Type);
 
-        internal TomlKey CloneKeyFor(TomlObject newParent)
+        internal TomlKey CloneKeyFor(ITomlContainer newOwner)
         {
-            return new TomlKey(this.Root, this.Value, this.Type)
-            {
-                parent = newParent,
-            };
+            return new TomlKey(this.Root, this.Value, this.Type) { owner = newOwner };
         }
 
-        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneKeyFor(newParent);
+        internal override TomlObject CloneFor(ITomlContainer newOwner) => this.CloneKeyFor(newOwner);
 
         private static KeyType AutoClassify(string input)
         {

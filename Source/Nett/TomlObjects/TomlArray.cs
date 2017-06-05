@@ -6,7 +6,12 @@
     using System.Linq;
     using Extensions;
 
-    public sealed class TomlArray : TomlValue<List<TomlValue>>, IEnumerable<TomlValue>, ICollection<TomlValue>, IList<TomlValue>
+    public sealed class TomlArray :
+        TomlValue<List<TomlValue>>,
+        IEnumerable<TomlValue>,
+        ICollection<TomlValue>,
+        IList<TomlValue>,
+        ITomlContainer
     {
         internal TomlArray(ITomlRoot root)
             : this(root, new List<TomlValue>())
@@ -32,6 +37,8 @@
         public int Count => this.Value.Count;
 
         public bool IsReadOnly => false;
+
+        ITomlRoot ITomlContainer.Root => this.Root;
 
         public TomlValue this[int index]
         {
@@ -138,12 +145,9 @@
             return new TomlArray(root, this.Value.Select(i => i.ValueWithRoot(root)).ToArray());
         }
 
-        internal TomlArray CloneArrayFor(TomlObject newParent)
+        internal TomlArray CloneArrayFor(ITomlContainer newOwner)
         {
-            var a = new TomlArray(this.Root)
-            {
-                parent = newParent,
-            };
+            var a = new TomlArray(this.Root) { owner = newOwner };
 
             foreach (var v in this.Value)
             {
@@ -153,7 +157,7 @@
             return a;
         }
 
-        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneArrayFor(newParent);
+        internal override TomlObject CloneFor(ITomlContainer newOwner) => this.CloneArrayFor(newOwner);
 
         private void CheckCanAttachItem(TomlValue item)
         {

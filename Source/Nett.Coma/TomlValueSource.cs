@@ -26,12 +26,12 @@
             throw new NotImplementedException();
         }
 
-        internal TomlSource CloneSourceFor(TomlObject newParent)
+        internal TomlSource CloneSourceFor(ITomlContainer newOwner)
         {
-            return new TomlSource(this.Root, this.Value) { parent = newParent };
+            return new TomlSource(this.Root, this.Value) { owner = newOwner };
         }
 
-        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneSourceFor(newParent);
+        internal override TomlObject CloneFor(ITomlContainer newOwner) => this.CloneSourceFor(newOwner);
 
         internal override TomlObject WithRoot(ITomlRoot root)
         {

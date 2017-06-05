@@ -29,14 +29,11 @@ namespace Nett
             return new TomlFloat(root, this.Value);
         }
 
-        internal TomlFloat CloneFloatFor(TomlObject parent)
+        internal TomlFloat CloneFloatFor(ITomlContainer newOwner)
         {
-            return new TomlFloat(this.Root, this.Value)
-            {
-                parent = parent,
-            };
+            return new TomlFloat(this.Root, this.Value) { owner = newOwner };
         }
 
-        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneFloatFor(newParent);
+        internal override TomlObject CloneFor(ITomlContainer newOwner) => this.CloneFloatFor(newOwner);
     }
 }

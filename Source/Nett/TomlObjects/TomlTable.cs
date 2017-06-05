@@ -10,7 +10,10 @@
 
     using static System.Diagnostics.Debug;
 
-    public partial class TomlTable : TomlObject, IDictionary<string, TomlObject>
+    public partial class TomlTable :
+        TomlObject, 
+        IDictionary<string, TomlObject>,
+        ITomlContainer
     {
         private readonly Dictionary<TomlKey, TomlObject> rows = new Dictionary<TomlKey, TomlObject>();
 
@@ -50,6 +53,8 @@
         internal Dictionary<TomlKey, TomlObject> InternalRows => this.rows;
 
         private IDictionary<string, TomlObject> AsDict => this;
+
+        ITomlRoot ITomlContainer.Root => this.Root;
 
         TomlObject IDictionary<string, TomlObject>.this[string key]
         {
@@ -284,9 +289,9 @@
             return table;
         }
 
-        internal TomlTable CloneTableFor(TomlObject newParent)
+        internal TomlTable CloneTableFor(ITomlContainer newOwner)
         {
-            var tbl = new TomlTable(this.Root, this.TableType) { parent = newParent };
+            var tbl = new TomlTable(this.Root, this.TableType) { owner = newOwner };
 
             foreach (var r in this.rows)
             {
@@ -296,7 +301,7 @@
             return tbl;
         }
 
-        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneTableFor(newParent);
+        internal override TomlObject CloneFor(ITomlContainer newOwner) => this.CloneTableFor(newOwner);
 
         internal override TomlObject WithRoot(ITomlRoot root) => this.TableWithRoot(root);
 

@@ -46,14 +46,11 @@
             return new TomlDateTime(root, this.Value);
         }
 
-        internal TomlDateTime CloneDateTimeFor(TomlObject newParent)
+        internal TomlDateTime CloneDateTimeFor(ITomlContainer newParent)
         {
-            return new TomlDateTime(this.Root, this.Value)
-            {
-                parent = newParent,
-            };
+            return new TomlDateTime(this.Root, this.Value) { owner = newParent };
         }
 
-        internal override TomlObject CloneFor(TomlObject newParent) => this.CloneDateTimeFor(newParent);
+        internal override TomlObject CloneFor(ITomlContainer newParent) => this.CloneDateTimeFor(newParent);
     }
 }

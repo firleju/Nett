@@ -97,6 +97,7 @@
     <Compile Include="TomlConfig.Builder.Conversion.cs">
       <DependentUpon>TomlConfig.cs</DependentUpon>
     </Compile>
+    <Compile Include="TomlObjects\ITomlContainer.cs" />
     <Compile Include="TomlObjects\TomlKey.cs" />
     <Compile Include="TomlObjectFactory.Add.cs" />
     <Compile Include="TomlObjectFactory.Create.cs" />

@@ -6,7 +6,12 @@
     using System.Linq;
     using Extensions;
 
-    public sealed class TomlTableArray : TomlObject, IEnumerable<TomlTable>, ICollection<TomlTable>, IList<TomlTable>
+    public sealed class TomlTableArray :
+        TomlObject,
+        IEnumerable<TomlTable>,
+        ICollection<TomlTable>,
+        IList<TomlTable>,
+        ITomlContainer
     {
         private static readonly Type ListType = typeof(IList);
         private static readonly Type ObjectType = typeof(object);
@@ -41,6 +46,8 @@
         public override TomlObjectType TomlType => TomlObjectType.ArrayOfTables;
 
         public bool IsReadOnly => false;
+
+        ITomlRoot ITomlContainer.Root => this.Root;
 
         public TomlTable this[int index]
         {
@@ -139,12 +146,9 @@
             return a;
         }
 
-        internal TomlTableArray CloneArrayFor(TomlObject newParent)
+        internal TomlTableArray CloneArrayFor(ITomlContainer newOwner)
         {
-            var ta = new TomlTableArray(this.Root)
-            {
-                parent = newParent,
-            };
+            var ta = new TomlTableArray(this.Root) { owner = newOwner };
 
             foreach (var t in this.items)
             {
@@ -154,10 +158,7 @@
             return ta;
         }
 
-        internal override TomlObject CloneFor(TomlObject newParent)
-        {
-            throw new NotImplementedException();
-        }
+        internal override TomlObject CloneFor(ITomlContainer newOwner) => this.CloneArrayFor(newOwner);
 
         private void CheckTableCanBeAttached(TomlTable table)
         {

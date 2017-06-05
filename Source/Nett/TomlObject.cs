@@ -28,9 +28,7 @@
 
         internal TomlObject(ITomlRoot root)
         {
-            if (root == null && this.GetType() != typeof(TomlTable.RootTable)) { throw new ArgumentNullException(nameof(root)); }
-
-            this.Root = root ?? (TomlTable.RootTable)this;
+            this.Root = root ?? this as TomlTable.RootTable;
             this.Comments = new List<TomlComment>();
         }
 

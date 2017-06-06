@@ -103,6 +103,7 @@
     <Compile Include="TomlObjectFactory.Create.cs" />
     <Compile Include="TomlObjectFactory.cs" />
     <Compile Include="TomlObjects\TomlTable.RootTable.cs" />
+    <Compile Include="TomlObjects\TomlTableRow.cs" />
     <Compile Include="TomlTableToDictionaryConverter.cs" />
     <Compile Include="Toml.cs" />
     <Compile Include="TomlObjects\TomlArray.cs" />

@@ -15,7 +15,7 @@
         IDictionary<string, TomlObject>,
         ITomlContainer
     {
-        private readonly Dictionary<TomlKey, TomlObject> rows = new Dictionary<TomlKey, TomlObject>();
+        private readonly Dictionary<string, TomlTableRow> rows = new Dictionary<string, TomlTableRow>();
 
         private volatile bool isFrozen = false;
 
@@ -35,48 +35,47 @@
 
         public bool IsReadOnly => this.isFrozen;
 
-        public ICollection<string> Keys => this.rows.Keys.Select(k => k.Value).ToList();
+        public ICollection<string> Keys => this.rows.Keys;
 
         public override string ReadableTypeName => "table";
 
         public IEnumerable<KeyValuePair<string, TomlObject>> Rows => this.rows.Select(
-            r => new KeyValuePair<string, TomlObject>(r.Key.Value, r.Value));
+            r => new KeyValuePair<string, TomlObject>(r.Key, r.Value.Value));
 
         public TableTypes TableType { get; internal set; }
 
         public override TomlObjectType TomlType => TomlObjectType.Table;
 
-        public ICollection<TomlObject> Values => this.rows.Values;
-
-        internal bool IsDefined { get; set; }
-
-        internal Dictionary<TomlKey, TomlObject> InternalRows => this.rows;
-
-        private IDictionary<string, TomlObject> AsDict => this;
+        public ICollection<TomlObject> Values => this.rows.Values.Select(r => r.Value).ToList();
 
         ITomlRoot ITomlContainer.Root => this.Root;
 
         ITomlContainer ITomlContainer.Parent => this.owner;
+
+        internal bool IsDefined { get; set; }
+
+        internal IEnumerable<TomlTableRow> InternalRows => this.rows.Values;
+
+        private IDictionary<string, TomlObject> AsDict => this;
 
         TomlObject IDictionary<string, TomlObject>.this[string key]
         {
             get
             {
                 this.AssertIntegrity();
-                TomlObject val;
-                if (!this.rows.TryGetValue(new TomlKey(this.Root, key), out val))
+                if (!this.rows.TryGetValue(key, out TomlTableRow row))
                 {
                     throw new KeyNotFoundException(string.Format("No row with key '{0}' exists in this TOML table.", key));
                 }
 
-                return val;
+                return row.Value;
             }
 
             set
             {
                 this.AssertIntegrity();
                 this.CheckNotFrozen();
-                this.rows[new TomlKey(this.Root, key)] = this.EnsureCorrectRoot(value);
+                this.rows[key] = new TomlTableRow(this, new TomlKey(this.Root, key), this.EnsureCorrectRoot(value));
                 this.OnRowValueSet(key);
             }
         }
@@ -93,10 +92,9 @@
             this.rows.Clear();
         }
 
-        public bool Contains(KeyValuePair<string, TomlObject> item)
-            => this.rows.Contains(new KeyValuePair<TomlKey, TomlObject>(new TomlKey(this.Root, item.Key), item.Value));
+        public bool Contains(KeyValuePair<string, TomlObject> item) => throw new NotSupportedException();
 
-        public bool ContainsKey(string key) => this.rows.ContainsKey(new TomlKey(this.Root, key));
+        public bool ContainsKey(string key) => this.rows.ContainsKey(key);
 
         public void CopyTo(KeyValuePair<string, TomlObject>[] array, int arrayIndex)
         {
@@ -111,7 +109,7 @@
 
             foreach (var r in this.rows)
             {
-                var tbl = r.Value as TomlTable;
+                var tbl = r.Value.Value as TomlTable;
                 if (tbl != null)
                 {
                     tbl.Freeze();
@@ -139,11 +137,11 @@
 
             foreach (var r in this.rows)
             {
-                var targetProperty = this.Root.Config.TryGetMappingProperty(result.GetType(), r.Key.Value);
+                var targetProperty = this.Root.Config.TryGetMappingProperty(result.GetType(), r.Key);
                 if (targetProperty != null)
                 {
-                    Type keyMapingTargetType = this.Root.Config.TryGetMappedType(r.Key.Value, targetProperty);
-                    targetProperty.SetValue(result, r.Value.Get(keyMapingTargetType ?? targetProperty.PropertyType), null);
+                    Type keyMapingTargetType = this.Root.Config.TryGetMappedType(r.Key, targetProperty);
+                    targetProperty.SetValue(result, r.Value.Value.Get(keyMapingTargetType ?? targetProperty.PropertyType), null);
                 }
             }
 
@@ -155,28 +153,28 @@
             var iterator = this.rows.GetEnumerator();
             while (iterator.MoveNext())
             {
-                yield return new KeyValuePair<string, TomlObject>(iterator.Current.Key.Value, iterator.Current.Value);
+                yield return new KeyValuePair<string, TomlObject>(iterator.Current.Key, iterator.Current.Value.Value);
             }
         }
 
         void ICollection<KeyValuePair<string, TomlObject>>.Add(KeyValuePair<string, TomlObject> item)
-            => this.AttachRow(new TomlKey(this.Root, item.Key), item.Value);
+            => this.AttachRow(item.Key, item.Value);
 
         void IDictionary<string, TomlObject>.Add(string key, TomlObject value)
-            => this.AttachRow(new TomlKey(this.Root, key), value);
+            => this.AttachRow(key, value);
 
         IEnumerator IEnumerable.GetEnumerator() => this.rows.GetEnumerator();
 
         public bool Remove(string key)
         {
             this.CheckNotFrozen();
-            return this.rows.Remove(new TomlKey(this.Root, key));
+            return this.rows.Remove(key);
         }
 
         public bool Remove(KeyValuePair<string, TomlObject> item)
         {
             this.CheckNotFrozen();
-            return this.rows.Remove(new TomlKey(this.Root, item.Key));
+            return this.rows.Remove(item.Key);
         }
 
         public Dictionary<string, object> ToDictionary()
@@ -187,13 +185,20 @@
 
         public TomlObject TryGetValue(string key)
         {
-            TomlObject o;
-            this.rows.TryGetValue(new TomlKey(this.Root, key), out o);
-            return o;
+            return this.rows.TryGetValue(key, out TomlTableRow row) ? row.Value : null;
         }
 
         public bool TryGetValue(string key, out TomlObject value)
-            => this.rows.TryGetValue(new TomlKey(this.Root, key), out value);
+        {
+            if (this.rows.TryGetValue(key, out TomlTableRow row))
+            {
+                value = row.Value;
+                return true;
+            }
+
+            value = null;
+            return false;
+        }
 
         public override void Visit(ITomlObjectVisitor visitor)
         {
@@ -237,22 +242,25 @@
             foreach (DictionaryEntry r in dict)
             {
                 var obj = TomlObject.CreateFrom(root, r.Value, null);
-                tomlTable.AttachRow(new TomlKey(tomlTable.Root, (string)r.Key), obj);
+                tomlTable.AttachRow((string)r.Key, obj);
             }
 
             return tomlTable;
+        }
+
+        internal TomlObject AttachRow(string key, TomlObject value)
+        {
+            this.CheckNotFrozen();
+            return this.AttachRow(new TomlKey(this.Root, key), value);
         }
 
         internal TomlObject AttachRow(TomlKey key, TomlObject value)
         {
             this.CheckNotFrozen();
 
-            key = (TomlKey)key.AttachToOrCloneFor(this);
-            value = value.AttachToOrCloneFor(key);
-
-            var toAdd = this.EnsureCorrectRoot(value);
-            this.rows.Add(key, toAdd);
-            return toAdd;
+            var toAdd = new TomlTableRow(this, key, value);
+            this.rows.Add(key.Value, toAdd);
+            return toAdd.Value;
         }
 
         internal override void OverwriteCommentsWithCommentsFrom(TomlObject src, bool overwriteWithEmpty)
@@ -266,10 +274,9 @@
             {
                 foreach (var r in this.rows)
                 {
-                    TomlObject sourceVal;
-                    if (srcTable.rows.TryGetValue(r.Key, out sourceVal))
+                    if (srcTable.rows.TryGetValue(r.Key, out TomlTableRow sourceRow))
                     {
-                        r.Value.OverwriteCommentsWithCommentsFrom(sourceVal, overwriteWithEmpty);
+                        r.Value.Value.OverwriteCommentsWithCommentsFrom(sourceRow.Value, overwriteWithEmpty);
                     }
                 }
             }
@@ -285,7 +292,7 @@
 
             foreach (var r in this.rows)
             {
-                table.AttachRow(r.Key, r.Value.WithRoot(root));
+                table.AttachRow(r.Key, r.Value.Value.WithRoot(root));
             }
 
             return table;
@@ -297,7 +304,7 @@
 
             foreach (var r in this.rows)
             {
-                tbl.AttachRow(r.Key, r.Value);
+                tbl.AttachRow(r.Key, r.Value.Value);
             }
 
             return tbl;
@@ -327,12 +334,12 @@
         {
             foreach (var a in allObjects.Where(o => !ScopeCreatingType(o.Item2)))
             {
-                this.AttachRow(new TomlKey(this.Root, a.Item1), a.Item2);
+                this.AttachRow(a.Item1, a.Item2);
             }
 
             foreach (var a in allObjects.Where(o => ScopeCreatingType(o.Item2)))
             {
-                this.AttachRow(new TomlKey(this.Root, a.Item1), a.Item2);
+                this.AttachRow(a.Item1, a.Item2);
             }
         }
 
@@ -346,7 +353,7 @@
                     + "triggers something in the TOML table implementation is broken and needs to be fixed.";
 
                 Assert(r.Value.Root == this.Root, message);
-                var tbl = r.Value as TomlTable;
+                var tbl = r.Value.Value as TomlTable;
 
                 if (tbl != null)
                 {

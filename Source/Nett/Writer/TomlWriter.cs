@@ -54,7 +54,7 @@
             this.writer.Write(']');
         }
 
-        protected void WriteKeyedValue(KeyValuePair<TomlKey, TomlObject> kvp)
+        protected void WriteKeyedValue(TomlTableRow kvp)
         {
             this.writer.Write(kvp.Key.ToString());
             this.writer.Write(" = ");

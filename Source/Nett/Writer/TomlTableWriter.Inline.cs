@@ -69,7 +69,7 @@
                 this.writer.Write(" }");
             }
 
-            private void WriteTableRow(KeyValuePair<TomlKey, TomlObject> r)
+            private void WriteTableRow(TomlTableRow r)
             {
                 if (r.Value.TomlType == TomlObjectType.Array)
                 {

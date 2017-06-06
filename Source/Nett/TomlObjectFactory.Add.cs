@@ -7,7 +7,7 @@ namespace Nett
     {
         public static TomlArray AddArray(this TomlTable table, string key, TomlArray a)
         {
-            table.AttachRow(new TomlKey(table.Root, key), a);
+            table.AttachRow(key, a);
             return a;
         }
 
@@ -40,7 +40,7 @@ namespace Nett
 
         public static TomlTable AddTable(this TomlTable table, string key, TomlTable t)
         {
-            table.AttachRow(new TomlKey(table.Root, key), t);
+            table.AttachRow(key, t);
             return t;
         }
 
@@ -67,7 +67,7 @@ namespace Nett
                 throw new InvalidOperationException("Cannot add TOML table array to table because it belongs to a different graph root.");
             }
 
-            table.AttachRow(new TomlKey(table.Root, key), array);
+            table.AttachRow(key, array);
             return array;
         }
 
@@ -80,42 +80,42 @@ namespace Nett
         public static TomlBool AddValue(this TomlTable table, string key, bool value)
         {
             var b = table.CreateAttachedValue(value);
-            table.AttachRow(new TomlKey(table.Root, key), b);
+            table.AttachRow(key, b);
             return b;
         }
 
         public static TomlString AddValue(this TomlTable table, string key, string value)
         {
             var s = table.CreateAttachedValue(value);
-            table.AttachRow(new TomlKey(table.Root, key), table.CreateAttachedValue(value));
+            table.AttachRow(key, table.CreateAttachedValue(value));
             return s;
         }
 
         public static TomlInt AddValue(this TomlTable table, string key, long value)
         {
             var i = table.CreateAttachedValue(value);
-            table.AttachRow(new TomlKey(table.Root, key), i);
+            table.AttachRow(key, i);
             return i;
         }
 
         public static TomlFloat AddValue(this TomlTable table, string key, double value)
         {
             var f = table.CreateAttachedValue(value);
-            table.AttachRow(new TomlKey(table.Root, key), f);
+            table.AttachRow(key, f);
             return f;
         }
 
         public static TomlDateTime AddValue(this TomlTable table, string key, DateTimeOffset dateTime)
         {
             var dt = table.CreateAttachedValue(dateTime);
-            table.AttachRow(new TomlKey(table.Root, key), dt);
+            table.AttachRow(key, dt);
             return dt;
         }
 
         public static TomlTimeSpan AddValue(this TomlTable table, string key, TimeSpan timeSpan)
         {
             var ts = table.CreateAttachedValue(timeSpan);
-            table.AttachRow(new TomlKey(table.Root, key), ts);
+            table.AttachRow(key, ts);
             return ts;
         }
     }

@@ -26,7 +26,7 @@
         private static bool IsInlineTomlTableArray(TomlTableArray a)
             => a.Items.Any(t => t.TableType == TomlTable.TableTypes.Inline);
 
-        private void WriteKeyedValueWithComments(KeyValuePair<TomlKey, TomlObject> row)
+        private void WriteKeyedValueWithComments(TomlTableRow row)
         {
             this.WritePrependComments(row.Value);
             this.WriteKeyedValue(row);
@@ -55,7 +55,7 @@
             this.WriteAppendComments(array);
         }
 
-        private void WriteTableRow(string parentKey, KeyValuePair<TomlKey, TomlObject> r)
+        private void WriteTableRow(string parentKey, TomlTableRow r)
         {
             this.WritePrependNewlines(r.Value);
 

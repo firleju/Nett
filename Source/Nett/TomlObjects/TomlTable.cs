@@ -11,7 +11,7 @@
     using static System.Diagnostics.Debug;
 
     public partial class TomlTable :
-        TomlObject, 
+        TomlObject,
         IDictionary<string, TomlObject>,
         ITomlContainer
     {
@@ -55,6 +55,8 @@
         private IDictionary<string, TomlObject> AsDict => this;
 
         ITomlRoot ITomlContainer.Root => this.Root;
+
+        ITomlContainer ITomlContainer.Parent => this.owner;
 
         TomlObject IDictionary<string, TomlObject>.this[string key]
         {

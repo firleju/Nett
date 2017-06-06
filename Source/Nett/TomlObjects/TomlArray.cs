@@ -40,6 +40,8 @@
 
         ITomlRoot ITomlContainer.Root => this.Root;
 
+        ITomlContainer ITomlContainer.Parent => this.owner;
+
         public TomlValue this[int index]
         {
             get => this.Value[index];

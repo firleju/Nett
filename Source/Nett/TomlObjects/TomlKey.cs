@@ -36,6 +36,8 @@ namespace Nett
 
         ITomlRoot ITomlContainer.Root => this.Root;
 
+        ITomlContainer ITomlContainer.Parent => this.owner;
+
         public static bool operator ==(TomlKey x, TomlKey y) => x.Value == y.Value;
 
         public static bool operator !=(TomlKey x, TomlKey y) => !(x == y);

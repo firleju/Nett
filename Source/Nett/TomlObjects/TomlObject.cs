@@ -38,7 +38,7 @@
 
         internal List<TomlComment> Comments { get; private set; }
 
-        internal ITomlRoot Root { get; }
+        internal virtual ITomlRoot Root { get; }
 
         public T Get<T>() => (T)this.Get(typeof(T));
 

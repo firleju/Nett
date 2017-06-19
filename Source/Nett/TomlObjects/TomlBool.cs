@@ -4,14 +4,16 @@ namespace Nett
 {
     public sealed class TomlBool : TomlValue<bool>
     {
-        internal TomlBool(ITomlRoot root, bool value)
-            : base(root, value)
+        internal TomlBool(bool value)
+            : base(null, value)
         {
         }
 
         public override string ReadableTypeName => "bool";
 
         public override TomlObjectType TomlType => TomlObjectType.Bool;
+
+        internal override ITomlRoot Root => this.owner.Root;
 
         public override void Visit(ITomlObjectVisitor visitor)
         {
@@ -26,12 +28,12 @@ namespace Nett
         {
             root.CheckNotNull(nameof(root));
 
-            return new TomlBool(root, this.Value);
+            return new TomlBool(this.Value);
         }
 
         internal TomlBool CloneBoolFor(ITomlContainer newOwner)
         {
-            return new TomlBool(this.Root, this.Value) { owner = newOwner };
+            return new TomlBool(this.Value) { owner = newOwner };
         }
 
         internal override TomlObject CloneFor(ITomlContainer newParent) => this.CloneBoolFor(newParent);

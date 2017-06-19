@@ -25,7 +25,7 @@
             this IConfigureConversionBuilder<TCustom, TomlBool> cb, Func<TCustom, bool> conv)
         {
             ((TomlConfig.ConversionConfigurationBuilder<TCustom, TomlBool>)cb).AddConverter(
-                new TomlConverter<TCustom, TomlBool>((root, customValue) => new TomlBool(root, conv(customValue))));
+                new TomlConverter<TCustom, TomlBool>((root, customValue) => new TomlBool(conv(customValue))));
             return cb;
         }
 
@@ -147,7 +147,7 @@
         .AddBidirectionalConverter<TomlString, string>((m, c) => new TomlString(m, c), (m, t) => t.Value)
         .AddBidirectionalConverter<TomlDateTime, DateTimeOffset>((m, c) => new TomlDateTime(m, c), (m, t) => t.Value)
         .AddBidirectionalConverter<TomlTimeSpan, TimeSpan>((m, c) => new TomlTimeSpan(m, c), (m, t) => t.Value)
-        .AddBidirectionalConverter<TomlBool, bool>((m, c) => new TomlBool(m, c), (m, t) => t.Value);
+        .AddBidirectionalConverter<TomlBool, bool>((m, c) => new TomlBool(c), (m, t) => t.Value);
 
         private static readonly List<ITomlConverter> SerializeConverters = new List<ITomlConverter>()
         {

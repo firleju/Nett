@@ -10,7 +10,7 @@ namespace Nett
             => new TomlArray(rootSource.Root);
 
         public static TomlArray CreateAttachedArray(this TomlObject rootSource, IEnumerable<bool> values)
-            => new TomlArray(rootSource.Root, values.Select(v => new TomlBool(rootSource.Root, v)).ToArray());
+            => new TomlArray(rootSource.Root, values.Select(v => new TomlBool(v)).ToArray());
 
         public static TomlArray CreateAttachedArray(this TomlObject rootSource, IEnumerable<string> values)
             => new TomlArray(rootSource.Root, values.Select(v => new TomlString(rootSource.Root, v)).ToArray());
@@ -89,7 +89,7 @@ namespace Nett
         }
 
         public static TomlBool CreateAttachedValue(this TomlObject rootSource, bool value)
-            => new TomlBool(rootSource.Root, value);
+            => new TomlBool(value);
 
         public static TomlString CreateAttachedValue(this TomlObject rootSource, string value)
             => new TomlString(rootSource.Root, value);

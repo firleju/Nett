@@ -132,10 +132,21 @@ namespace Nett.Parser
 
         private IReq<ValueNode> Value(ICommentsContext cctx)
         {
-            return SimpleValue()
+            return SimpleOrUnitVal()
                 .Or(Array)
                 .Or(InlineTable)
                 .OrNode(() => SyntaxErrorNode.Unexpected("Expected TOML value", this.input.Current));
+
+            IOpt<ValueNode> SimpleOrUnitVal()
+            {
+                var sv = SimpleValue();
+
+                return this.input.Accept(t => t.Type == TokenType.BareKey && sv.HasNode && FeatureFlags.UnitValues)
+                    .CreateNode(t => ValueNode.CreateNonTerminalValue(
+                        new UnitValueNode(sv.NodeOrDefault().Req(), t).Req())
+                        .Opt())
+                    .Or(() => sv);
+            }
 
             IOpt<ValueNode> SimpleValue()
                 => this.input

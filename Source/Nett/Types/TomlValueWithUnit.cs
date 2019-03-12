@@ -2,46 +2,57 @@
 
 namespace Nett
 {
-    public class TomlValueWithUnit : TomlValue
-    {
-        public TomlValueWithUnit(string value, string unit)
-            : base(null, null)
-        {
-            this.Value = value;
-            this.Unit = unit;
-        }
+    //public sealed class TomlValueWithUnit : TomlValue
+    //{
+    //    public TomlValueWithUnit(ITomlRoot root, TomlValue value, string unit)
+    //        : base(root, value.UntypedValue)
+    //    {
+    //        this.Value = value;
+    //        this.Unit = unit;
+    //    }
 
-        public string Value { get; }
+    //    public TomlValue Value { get; }
 
-        public string Unit { get; }
+    //    public string Unit { get; }
 
-        public override string ReadableTypeName => throw new NotImplementedException();
+    //    public override string ReadableTypeName
+    //        => "Value with Unit";
 
-        public override TomlObjectType TomlType => throw new NotImplementedException();
+    //    public override TomlObjectType TomlType
+    //        => TomlObjectType.ValueWithUnit;
 
-        public override object Get(Type t)
-        {
-            throw new NotImplementedException();
-        }
+    //    public override object Get(Type t)
+    //    {
+    //        if (t == Types.TomlValueWithUnit) { return this; }
 
-        public override void Visit(ITomlObjectVisitor visitor)
-        {
-            throw new NotImplementedException();
-        }
+    //        try
+    //        {
+    //            return base.Get(t);
+    //        }
+    //        catch
+    //        {
+    //            return this.Value.Get(t);
+    //        }
+    //    }
 
-        internal override TomlObject CloneFor(ITomlRoot root)
-        {
-            throw new NotImplementedException();
-        }
+    //    public override void Visit(ITomlObjectVisitor visitor)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        internal override TomlValue ValueWithRoot(ITomlRoot root)
-        {
-            throw new NotImplementedException();
-        }
+    //    internal override TomlObject CloneFor(ITomlRoot root)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        internal override TomlObject WithRoot(ITomlRoot root)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    //    internal override TomlValue ValueWithRoot(ITomlRoot root)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    internal override TomlObject WithRoot(ITomlRoot root)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 }

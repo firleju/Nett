@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Nett.Extensions;
 using Nett.Parser.Nodes;
 
 namespace Nett.Parser
@@ -6,10 +7,12 @@ namespace Nett.Parser
     internal sealed class Parser
     {
         private readonly MultiParseInput input;
+        private readonly TomlSettings settings;
 
-        public Parser(IParseInput input)
+        public Parser(IParseInput input, TomlSettings settings)
         {
             this.input = new MultiParseInput(input, new SkippingParseInput(input, toSkip: TokenType.NewLine));
+            this.settings = settings.CheckNotNull(nameof(settings));
         }
 
         public IOpt<StartNode> Parse()
@@ -132,21 +135,22 @@ namespace Nett.Parser
 
         private IReq<ValueNode> Value(ICommentsContext cctx)
         {
-            return SimpleOrUnitVal()
+            var value = SimpleValue()
                 .Or(Array)
                 .Or(InlineTable)
                 .OrNode(() => SyntaxErrorNode.Unexpected("Expected TOML value", this.input.Current));
 
-            IOpt<ValueNode> SimpleOrUnitVal()
+            if (this.settings.IsFeautureEnabled(ExperimentalFeature.ValueWithUnit) && value.HasNode)
             {
-                var sv = SimpleValue();
-
-                return this.input.Accept(t => t.Type == TokenType.BareKey && sv.HasNode && FeatureFlags.UnitValues)
-                    .CreateNode(t => ValueNode.CreateNonTerminalValue(
-                        new UnitValueNode(sv.NodeOrDefault().Req(), t).Req())
-                        .Opt())
-                    .Or(() => sv);
+                var unit = this.input.Accept(t => t.Type == TokenType.BareKey || t.Type == TokenType.Unit)
+                    .CreateNode(t => new TerminalNode(t.Trimmed()).Opt());
+                if (unit.HasNode)
+                {
+                    return value.SyntaxNode().WithUnitAttached(unit);
+                }
             }
+
+            return value;
 
             IOpt<ValueNode> SimpleValue()
                 => this.input

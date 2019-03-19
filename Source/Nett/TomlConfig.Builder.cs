@@ -11,6 +11,8 @@
 
     public sealed partial class TomlSettings
     {
+
+
         public interface IMappingBuilder<TCustom>
         {
             ITypeSettingsBuilder<TCustom> ToKey(string key);
@@ -77,11 +79,6 @@
             IPropertyMappingBuilder UseKeyGenerator(Func<KeyGenerators, IKeyGenerator> standardGenerators);
         }
 
-        public interface IEnableFeatureBuilder
-        {
-            IEnableFeatureBuilder ValuesWithUnit();
-        }
-
         public interface ITomlSettingsBuilder
         {
             ITomlSettingsBuilder AllowImplicitConversions(ConversionSets sets);
@@ -91,8 +88,6 @@
             ITomlSettingsBuilder ConfigureType<T>(Action<ITypeSettingsBuilder<T>> ct);
 
             ITableKeyMappingBuilder MapTableKey(string key);
-
-            ITomlSettingsBuilder EnableExperimentalFeatures(Action<IEnableFeatureBuilder> builder);
 
             /// <summary>
             /// Configures the property mapping settings that define how TOML rows are mapped to corresponding CLR object
@@ -189,7 +184,7 @@
                 => this.UseTargetPropertySelector(selectStandardRule(TargetPropertySelectors.Instance));
         }
 
-        internal sealed class TomlSettingsBuilder : ITomlSettingsBuilder, IEnableFeatureBuilder
+        internal sealed class TomlSettingsBuilder : ITomlSettingsBuilder, IExpSettingsBuilder
         {
             private readonly TomlSettings settings = new TomlSettings();
             private readonly List<ITomlConverter> userConverters = new List<ITomlConverter>();
@@ -257,16 +252,9 @@
                 }
             }
 
-            public ITomlSettingsBuilder EnableExperimentalFeatures(Action<IEnableFeatureBuilder> builder)
+            void IExpSettingsBuilder.EnableExperimentalFeature(ExperimentalFeature feature, bool enable)
             {
-                builder(this);
-                return this;
-            }
-
-            public IEnableFeatureBuilder ValuesWithUnit()
-            {
-                this.settings.featureFlags[ExperimentalFeature.ValueWithUnit] = true;
-                return this;
+                this.settings.featureFlags[feature] = enable;
             }
 
             private void SetupUserConverters()

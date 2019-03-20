@@ -37,5 +37,20 @@ namespace Nett
                 return this;
             }
         }
+
+        public static IConversionSettingsBuilder<TCustom, TomlFloat> ToToml<TCustom>(
+                    this IConversionSettingsBuilder<TCustom, TomlFloat> cb, Func<TCustom, double> conv, Func<TCustom, string> unit)
+        {
+            ((TomlSettings.ConversionSettingsBuilder<TCustom, TomlFloat>)cb).AddConverter(
+                new TomlConverter<TCustom, TomlFloat>((root, customValue) =>
+                {
+                    return new TomlFloat(root, conv(customValue))
+                    {
+                        Unit = unit(customValue),
+                    };
+                }));
+            return cb;
+        }
+
     }
 }

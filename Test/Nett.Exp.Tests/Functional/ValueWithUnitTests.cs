@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using FluentAssertions;
+using Nett.Parser;
 using Xunit;
 
 namespace Nett.Exp.Tests.Functional
@@ -19,7 +20,7 @@ namespace Nett.Exp.Tests.Functional
             // Assert
             var obj = t.Get<TomlFloat>("X");
 
-            obj.Unit.Should().Be("$");
+            obj.GetUnit().Should().Be("$");
             obj.Value.Should().Be(11.4);
         }
 
@@ -35,7 +36,7 @@ namespace Nett.Exp.Tests.Functional
         }
 
         [Fact]
-        public void ReadValuewWithUnit_WithSimpleUnit_ReadsItAsValueWithUnit()
+        public void GivenUnitWithSpacesAround_WhenUnitWasRead_UnitIsTrimmmed()
         {
             // Act
             var t = Toml.ReadString<Root>("X = 11.4 ( USD )", CreateSettings());
@@ -43,6 +44,17 @@ namespace Nett.Exp.Tests.Functional
             // Assert
             t.X.Value.Should().Be(11.4);
             t.X.Currency.Should().Be("USD");
+        }
+
+        [Fact]
+        public void GivenUnitWithSpacesInUnit_WhenUnitWasRead_KeptThatInnerSpacesInUnit()
+        {
+            // Act
+            var t = Toml.ReadString<Root>("X = 11.4 ( U S \\ \\D  \t\t )", CreateSettings());
+
+            // Assert
+            t.X.Value.Should().Be(11.4);
+            t.X.Currency.Should().Be(@"U S \ \D");
         }
 
         [Fact]
@@ -75,6 +87,38 @@ namespace Nett.Exp.Tests.Functional
             t.X.Should().BeEquivalentTo(new Root2().X);
         }
 
+        [Theory]
+        [InlineData("", "")]
+        [InlineData("A", "A")]
+        [InlineData("3", "3")]
+        [InlineData("3 A", "3 A")]
+        [InlineData(" 3 A ", "3 A")]
+        [InlineData("m \\ s", "m \\ s")]
+        [InlineData("m\\s", "m\\s")]
+        [InlineData("\"B\"", "\"B\"")]
+        public void GivenValidTomlWithUnit_WhenRead_ThenProducesCorrectStringUnit(string unit, string expected)
+        {
+            // Act
+            var t = Toml.ReadString($"X = 2.3 ({unit})", CreateSettings());
+
+            // Assert
+            t.Get<TomlFloat>("X").GetUnit().Should().Be(expected);
+        }
+
+        [Theory]
+        [InlineData("(()")]
+        [InlineData("())")]
+        [InlineData("(u))")]
+        [InlineData("(u)(u)")]
+        public void GivenInvalidTomlWithUnit_WhenRead_ThenProducesParseError(string unit)
+        {
+            // Act
+            Action a = () => Toml.ReadString($"X = 2.3 ({unit})", CreateSettings());
+
+            // Assert
+            a.Should().Throw<ParseException>();
+        }
+
         private static TomlSettings CreateSettings()
         {
             var cfg = TomlSettings.Create(s => s
@@ -82,8 +126,8 @@ namespace Nett.Exp.Tests.Functional
                     .ValuesWithUnit())
                 .ConfigureType<Money>(ct => ct
                     .WithConversionFor<TomlFloat>(conv => conv
-                        .ToToml(m => Tuple.Create(m.Value, m.Currency))
-                        .FromToml(uv => new Money() { Currency = uv.Unit, Value = uv.Value }))));
+                        .ToToml(m => m.Value, m => m.Currency)
+                        .FromToml(uv => new Money() { Currency = uv.GetUnit(), Value = uv.Value }))));
             return cfg;
         }
 

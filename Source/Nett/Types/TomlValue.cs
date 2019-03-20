@@ -33,7 +33,7 @@
 
         public object UntypedValue { get; }
 
-        public string Unit { get; set; } = string.Empty;
+        internal string Unit { get; set; } = null;
 
         public override object Get(Type t)
         {

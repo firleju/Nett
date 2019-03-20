@@ -45,21 +45,6 @@
             return cb;
         }
 
-        public static IConversionSettingsBuilder<TCustom, TomlFloat> ToToml<TCustom>(
-                    this IConversionSettingsBuilder<TCustom, TomlFloat> cb, Func<TCustom, Tuple<double, string>> conv)
-        {
-            ((TomlSettings.ConversionSettingsBuilder<TCustom, TomlFloat>)cb).AddConverter(
-                new TomlConverter<TCustom, TomlFloat>((root, customValue) =>
-                {
-                    var valAndUnit = conv(customValue);
-                    return new TomlFloat(root, valAndUnit.Item1)
-                    {
-                        Unit = valAndUnit.Item2,
-                    };
-                }));
-            return cb;
-        }
-
         public static IConversionSettingsBuilder<TCustom, TomlString> ToToml<TCustom>(
             this IConversionSettingsBuilder<TCustom, TomlString> cb, Func<TCustom, string> conv)
         {
